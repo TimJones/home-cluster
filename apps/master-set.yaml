@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: master-set
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/TimJones/home-cluster.git
+      revision: HEAD
+      files:
+      - path: apps/**/config.argocd
+  template:
+    metadata:
+      name: '{{ name }}'
+    spec:
+      project: '{{ project }}'
+      source:
+        repoURL: https://github.com/TimJones/home-cluster.git
+        targetRevision: HEAD
+        path: apps/{{ name }}
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{ namespace }}'
