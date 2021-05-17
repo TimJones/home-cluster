@@ -1,0 +1,162 @@
+apiVersion: cluster.x-k8s.io/v1alpha3
+kind: Cluster
+metadata:
+  name: home-talos-cluster
+  namespace: talos-system
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 10.244.0.0/16
+    services:
+      cidrBlocks:
+      - 10.96.0.0/12
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+    kind: TalosControlPlane
+    name: home-talos-cluster-cp
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+    kind: MetalCluster
+    name: home-talos-cluster
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: MetalCluster
+metadata:
+  name: home-talos-cluster
+  namespace: talos-system
+spec:
+  controlPlaneEndpoint:
+    host: 192.168.1.100
+    port: 6443
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: MetalMachineTemplate
+metadata:
+  name: home-talos-cluster-cp
+  namespace: talos-system
+spec:
+  template:
+    spec:
+      serverClassRef:
+        apiVersion: metal.sidero.dev/v1alpha1
+        kind: ServerClass
+        name: low-power-x86-64-up
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1alpha3
+kind: TalosControlPlane
+metadata:
+  name: home-talos-cluster-cp
+  namespace: talos-system
+spec:
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+    kind: MetalMachineTemplate
+    name: home-talos-cluster-cp
+  replicas: 1
+  version: v1.21.1
+  controlPlaneConfig:
+    init:
+      generateType: init
+      talosVersion: v0.10.2
+      configPatches:
+      # Non-production cluster, use the master nodes!
+      - op: replace
+        path: /cluster/allowSchedulingOnMasters
+        value: true
+      # Kube-router all features
+      - op: replace
+        path: /cluster/network/cni
+        value:
+          name: custom
+          urls:
+          - https://raw.githubusercontent.com/TimJones/home-cluster/main/talos/kube-router.yaml
+      - op: replace
+        path: /cluster/proxy/disabled
+        value: true
+      - op: add
+        path: /cluster/controllerManager/extraArgs
+        value:
+          allocate-node-cidrs: true
+          cluster-cidr: 10.244.0.0/16
+          service-cluster-ip-range: 10.96.0.0/12
+      - op: add
+        path: /machine/kubelet/extraArgs
+        value:
+          network-plugin: cni
+    controlplane:
+      generateType: controlplane
+      talosVersion: v0.10.2
+      configPatches:
+      # Non-production cluster, use the master nodes!
+      - op: replace
+        path: /cluster/allowSchedulingOnMasters
+        value: true
+      # Kube-router all features
+      - op: replace
+        path: /cluster/network/cni
+        value:
+          name: custom
+          urls:
+          - https://raw.githubusercontent.com/TimJones/home-cluster/main/talos/kube-router.yaml
+      - op: replace
+        path: /cluster/proxy/disabled
+        value: true
+      - op: add
+        path: /cluster/controllerManager/extraArgs
+        value:
+          allocate-node-cidrs: true
+          cluster-cidr: 10.244.0.0/16
+          service-cluster-ip-range: 10.96.0.0/12
+      - op: add
+        path: /machine/kubelet/extraArgs
+        value:
+          network-plugin: cni
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
+kind: TalosConfigTemplate
+metadata:
+  name: home-talos-cluster-workers
+  namespace: talos-system
+spec:
+  template:
+    spec:
+      generateType: join
+      talosVersion: v0.10.2
+---
+apiVersion: cluster.x-k8s.io/v1alpha3
+kind: MachineDeployment
+metadata:
+  name: home-talos-cluster-workers
+  namespace: talos-system
+spec:
+  clusterName: home-talos-cluster
+  replicas: 0
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
+          kind: TalosConfigTemplate
+          name: home-talos-cluster-workers
+      clusterName: home-talos-cluster
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+        kind: MetalMachineTemplate
+        name: home-talos-cluster-workers
+      version: v1.21.1
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha3
+kind: MetalMachineTemplate
+metadata:
+  name: home-talos-cluster-workers
+  namespace: talos-system
+spec:
+  template:
+    spec:
+      serverClassRef:
+        apiVersion: metal.sidero.dev/v1alpha1
+        kind: ServerClass
+        name: any
