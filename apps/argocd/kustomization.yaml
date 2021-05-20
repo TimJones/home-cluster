@@ -7,3 +7,4 @@ resources:
 - github.com/argoproj/argo-cd/manifests/cluster-install?ref=v2.0.1
 - github.com/argoproj-labs/applicationset/manifests/namespace-install?ref=v0.1.0
 - master-set.yaml
+- ./projects
