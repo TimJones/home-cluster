@@ -1,0 +1,5 @@
+{
+  "name": "argocd",
+  "project": "argocd",
+  "namespace": "argocd"
+}
