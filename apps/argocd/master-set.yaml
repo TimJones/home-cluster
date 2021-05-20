@@ -8,7 +8,7 @@ spec:
       repoURL: https://github.com/TimJones/home-cluster.git
       revision: HEAD
       files:
-      - path: apps/**/config.argocd
+      - path: apps/**/argocd.json
   template:
     metadata:
       name: '{{ name }}'
