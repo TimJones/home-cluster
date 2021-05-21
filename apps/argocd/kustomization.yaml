@@ -8,3 +8,6 @@ resources:
 - github.com/argoproj-labs/applicationset/manifests/namespace-install?ref=v0.1.0
 - master-set.yaml
 - ./projects
+
+patches:
+- custom-tooling.yaml

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+spec:
+  template:
+    spec:
+      volumes:
+      - name: custom-tools
+        emptyDir: {}
+      initContainers:
+      - name: download-kustomize
+        image: alpine:3.8
+        env:
+        - name: KUSTOMIZE_VER
+          value: v4.1.3
+        command:
+        - sh
+        - -c
+        args:
+        - wget -O- https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VER}/kustomize_${KUSTOMIZE_VER}_linux_amd64.tar.gz | tar -xvzf- && mv kustomize /custom-tools/kustomize_${KUSTOMIZE_VER}
+        volumeMounts:
+        - name: custom-tools
+          mountPath: /custom-tools
+      containers:
+      - name: argocd-repo-server
+        volumeMounts:
+        - name: custom-tools
+          mountPath: /custom-tools
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+data:
+  kustomize.path.v4.1.3: /custom-tools/kustomize_v4.1.3
+  kustomize.buildOptions.v4.1.3: --enable-helm
