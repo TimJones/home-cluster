@@ -18,6 +18,8 @@ spec:
         repoURL: https://github.com/TimJones/home-cluster.git
         targetRevision: HEAD
         path: apps/{{ name }}
+        kustomize:
+          version: v4.1.3
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{ namespace }}'
