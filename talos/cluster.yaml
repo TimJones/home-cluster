@@ -58,7 +58,7 @@ spec:
   controlPlaneConfig:
     init:
       generateType: init
-      talosVersion: v0.10.2
+      talosVersion: v0.10.3
       configPatches: &init-config-patches
       # Non-production cluster, use the master nodes!
       - op: replace
@@ -86,7 +86,7 @@ spec:
           network-plugin: cni
     controlplane:
       generateType: controlplane
-      talosVersion: v0.10.2
+      talosVersion: v0.10.3
       configPatches: *init-config-patches
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1alpha3
@@ -98,7 +98,7 @@ spec:
   template:
     spec:
       generateType: join
-      talosVersion: v0.10.2
+      talosVersion: v0.10.3
 ---
 apiVersion: cluster.x-k8s.io/v1alpha3
 kind: MachineDeployment
