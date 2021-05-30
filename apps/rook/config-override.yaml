@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rook-config-override
+data:
+  config: |
+    [global]
+    public network = 192.168.50.0/24
+    cluster network = 192.168.60.0/24
+    public addr = ""
+    cluster addr = ""

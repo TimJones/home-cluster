@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: rook-ceph
+
+helmCharts:
+- name: rook-ceph
+  releaseName: rook-ceph
+  version: v1.6.3
+  repo: https://charts.rook.io/release
+
+resources:
+- ceph-cluster.yaml
+- config-override.yaml

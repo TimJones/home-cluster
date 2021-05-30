@@ -1,0 +1,5 @@
+{
+  "name": "rook-ceph",
+  "project": "rook-ceph",
+  "namespace": "rook-ceph"
+}
