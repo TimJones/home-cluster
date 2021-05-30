@@ -7,19 +7,19 @@ spec:
   - git:
       repoURL: https://github.com/TimJones/home-cluster.git
       revision: HEAD
-      files:
-      - path: apps/**/argocd.json
+      directories:
+      - path: apps/*
   template:
     metadata:
-      name: '{{ name }}'
+      name: '{{ path.basename }}'
     spec:
-      project: '{{ project }}'
+      project: '{{ path.basename }}'
       source:
         repoURL: https://github.com/TimJones/home-cluster.git
         targetRevision: HEAD
-        path: apps/{{ name }}
+        path: '{{ path }}'
         kustomize:
           version: v4.1.3
       destination:
         server: https://kubernetes.default.svc
-        namespace: '{{ namespace }}'
+        namespace: '{{ path.basename }}'
