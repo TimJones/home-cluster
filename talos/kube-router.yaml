@@ -31,7 +31,7 @@ data:
     - name: cluster
       cluster:
         certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        server: https://192.168.1.100:6443
+        server: https://192.168.20.100:6443
     users:
     - name: kube-router
       user:
